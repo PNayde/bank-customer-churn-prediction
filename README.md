@@ -27,7 +27,7 @@ This work was completed as part of a take-home data science assignment.
 ---
 
 ## Dataset
-The dataset contains demographic, account, and behavioural features.  
+The dataset is available from Kaggle (https://www.kaggle.com/datasets/shubhammeshram579/bank-customer-churn-prediction/data) and contains demographic, account, and behavioural features.  
 **Target variable:** `Churn` (1 = churned, 0 = retained).
 
 ---
