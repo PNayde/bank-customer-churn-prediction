@@ -6,63 +6,57 @@
 ![Release](https://img.shields.io/github/v/release/PNayde/bank-customer-churn-prediction?display_name=tag)
 
 ## Overview
-This repository demonstrates an **end-to-end churn prediction** workflow focused on **explainable, decision-ready** outputs. It covers data exploration, model development, operating-threshold selection, and a small **FastAPI** service for inference, with **CI** to run tests and keep things healthy.
-
+This repository demonstrates an **end-to-end churn prediction** workflow focused on **decision-ready** outputs. It covers data exploration, model development, validation, and a small **FastAPI** service for inference, with **CI** to keep the project healthy.  
 > Goal: help product/retention teams identify customers at risk of churn while keeping false alarms low.
 
 ---
 
 ## Project Goals
 - Explore and visualise customer/usage features  
-- Train strong tabular baselines (e.g., Logistic Regression, Gradient-Boosted Trees)  
-- **Select an operating threshold** aligned to business goals (e.g., F1 or recall@target precision)  
-- Provide **interpretability** (feature importances, permutation importance, threshold analysis)  
+- Train strong tabular baselines (Logistic Regression, Gradient-Boosted Trees)  
+- Provide **interpretability** (feature importances, permutation importance, threshold analysis if desired)  
 - Ship a minimal **API** for demo inference + **Docker** image + **CI** tests  
 - Keep everything **reproducible** and easy to run
 
 ---
 
 ## Data
-- **Source:** (Replace with your dataset/source link)  
+- **Source:** (Add the dataset/source link you used)  
 - **Target:** Binary `churn` (1 = churned, 0 = retained)  
 - **Typical features:** tenure, contract type, monthly charges, payment method, etc.  
-- **Imbalance:** Common in churn — evaluated with precision/recall/F1, not accuracy alone.
-
-> If you’re using the Telco Churn dataset from IBM/Kaggle, link it here.
+- **Imbalance:** Common in churn — evaluated with precision/recall/F1 and ROC-AUC (not accuracy alone).
 
 ---
 
 ## Approach
-1. **EDA:** distributions, churn rates by segment, leakage checks  
-2. **Preprocessing:** categorical encoding, scaling (where needed), train/validation/test splits with **fixed random seed**  
-3. **Modelling:** Logistic Regression / Random Forest / XGBoost/LightGBM (cross-validated)  
-4. **Threshold Tuning:** choose a probability cutoff **T** that matches stakeholder goals  
-5. **Evaluation:** ROC-AUC, Precision/Recall/F1, confusion matrices, calibration checks  
-6. **Interpretability:** feature importances + permutation importance (no heavy deps)  
-7. **Delivery:** API endpoint, Docker image, GitHub Actions test workflow
+1. **EDA** — distributions, churn rates by segment, leakage checks  
+2. **Preprocessing** — categorical encoding, scaling where needed; train/validation/test splits with **fixed random seed**  
+3. **Modelling** — Logistic Regression / XGBoost (cross-validated). **Optuna** was used to tune XGBoost.  
+4. **Evaluation** — ROC-AUC, Precision/Recall/F1, confusion matrices, calibration checks  
+5. **Delivery** — API endpoint, Docker image, GitHub Actions test workflow
 
 ---
 
-## Results
+## Results (held-out test set)
+| Model                        | Accuracy | Recall (Churn) | Precision (Churn) |   F1 (Churn) | ROC-AUC |
+|-----------------------------|:--------:|:--------------:|:-----------------:|------------:|:-------:|
+| Logistic Regression (Tuned) |  0.711   |      0.689     |        0.384      | **0.493**   |  0.770  |
+| **XGBoost (Tuned)**         | **0.805**|   **0.753**    |     **0.515**     | **0.611**   | **0.868** |
 
-| Model | Accuracy | Recall (Churn) | Precision (Churn) | F1 (Churn) | ROC-AUC |
-|-------|----------|----------------|-------------------|------------|---------|
-| Logistic Regression (Tuned) | 0.711 | 0.689 | 0.384 | 0.493 | 0.770 |
-| XGBoost (Tuned) | 0.805 | 0.753 | 0.515 | 0.611 | 0.868 |
-
-<sub>Pick **T** on validation to hit your business target (e.g., maximise F1 or achieve ≥70% precision), then **fix** it on the test set.</sub>
+**Selected model:** **XGBoost (tuned)** — best overall ROC-AUC and balanced F1 on the positive class (churn = 1).  
+<sub>Metrics pulled from the attached analysis notebook. Accuracy is shown for completeness; prioritise Recall/Precision/F1 and ROC-AUC for imbalanced churn problems.</sub>
 
 ### 🔎 Validation protocol
 - Split: stratified train/validation/test (e.g., **60/20/20**), **seed=42**  
-- CV/HPO: stratified K-fold for tuning; same preprocessing per fold  
-- Imbalance: class weighting and/or thresholding; report metrics for positive class (churn=1)  
-- Metrics reported on the **held-out test** set only
+- CV/HPO: stratified K-fold for tuning; same preprocessing per fold (Optuna for XGBoost)  
+- Imbalance: handled via weighting/threshold analysis; metrics reported for **churn = 1**  
+- All metrics reported on the **held-out test** set
 
 ---
 
 ## Business Impact
 - **Targeted retention:** surface high-risk customers for proactive offers  
-- **Lower churn costs:** tune the threshold to reduce wasted outreach  
+- **Lower churn costs:** use threshold analysis to balance outreach cost vs. saved revenue (optional)  
 - **Interpretability:** ranked drivers of churn support policy and product changes  
 - **Ops readiness:** API + Docker + CI make demos/deployments straightforward
 
@@ -133,20 +127,7 @@ README.md
 - Pinned Python version; single `requirements.txt`  
 - Fixed random seeds; consistent preprocessing across CV folds  
 - Clear separation of train/validation/test  
-- Threshold chosen on validation, **frozen** for test
-
----
-
-## Next Steps
-- Save a trained pipeline for real inference:
-~~~python
-import joblib, os
-os.makedirs("models", exist_ok=True)
-joblib.dump(pipeline, "models/pipeline.joblib")
-~~~
-- Add permutation importance & partial dependence plots to `reports/figures/`  
-- Calibrate probabilities (Platt/isotonic) if business requires calibrated risk scores  
-- Monitor drift and refresh thresholds on a cadence
+- (Optional) If you later pick a probability **threshold T**, choose it on validation and **freeze** it for test
 
 ---
 
