@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Bank Customer Churn Prediction — End-to-End Data Science Project"
+type: software
+authors:
+  - family-names: Naydenova
+    given-names: Plamena
+repository-code: "https://github.com/PNayde/bank-customer-churn-prediction"
+license: MIT
+version: "0.1.0"
+date-released: "2025-08-29"
+keywords:
+  - churn
+  - machine learning
+  - classification
+  - imbalanced data
+  - fastapi
+  - docker
+  - github actions
+preferred-citation:
+  type: software
+  authors:
+    - family-names: Naydenova
+      given-names: Plamena
+  title: "Bank Customer Churn Prediction — End-to-End Data Science Project"
+  year: 2025
+  url: "https://github.com/PNayde/bank-customer-churn-prediction"
