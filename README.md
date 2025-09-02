@@ -21,7 +21,8 @@ This repository demonstrates an **end-to-end churn prediction** workflow focused
 ---
 
 ## Data
-- **Source:** (Add the dataset/source link you used)  
+- **Source:** (https://www.kaggle.com/datasets/shubhammeshram579/bank-customer-
+churn-prediction) 
 - **Target:** Binary `churn` (1 = churned, 0 = retained)  
 - **Typical features:** tenure, contract type, monthly charges, payment method, etc.  
 - **Imbalance:** Common in churn — evaluated with precision/recall/F1 and ROC-AUC (not accuracy alone).
